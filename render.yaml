@@ -1,0 +1,51 @@
+services:
+  - type: web
+    name: concessionaria-bem
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /login
+    envVars:
+      - key: DB_HOST
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASS
+        sync: false
+      - key: DB_CHARSET
+        value: utf8mb4
+      - key: DB_PORT
+        value: "3306"
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_URL
+        sync: false
+      - key: APP_SECRET
+        sync: false
+      - key: ASAAS_API_URL
+        value: https://api-sandbox.asaas.com/v3
+      - key: ASAAS_API_KEY
+        sync: false
+      - key: ASAAS_WEBHOOK_TOKEN
+        sync: false
+      - key: EMPRESA_CNPJ
+        sync: false
+      - key: EMPRESA_NOME
+        sync: false
+      - key: EMPRESA_BANCO
+        sync: false
+      - key: EMPRESA_AGENCIA
+        sync: false
+      - key: EMPRESA_CONTA
+        sync: false
+      - key: SESSION_LIFETIME
+        value: "3600"
+      - key: UPLOAD_MAX_SIZE_MB
+        value: "10"
+      - key: LOG_ENABLED
+        value: "true"
