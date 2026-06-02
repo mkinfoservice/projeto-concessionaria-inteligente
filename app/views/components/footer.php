@@ -51,9 +51,9 @@
                 <p style="color: var(--gray-400); font-size: 0.9rem; margin-bottom: 1rem;">
                     Faça uma cotação gratuita em menos de 2 minutos.
                 </p>
-                <button class="btn btn-primary btn-full" onclick="CIB.openModal('modal-cotacao')">
-                    Cotar Plano Grátis
-                </button>
+                <a href="/solicitar-plano" class="btn btn-primary btn-full">
+                    Cotar sozinho sem conta
+                </a>
             </div>
         </div>
 

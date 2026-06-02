@@ -44,7 +44,7 @@ $uperfil = $user_perfil ?? null;
             <?php else: ?>
                 <a href="/login" class="btn btn-ghost btn-sm">Login</a>
                 <a href="/solicitar-plano" class="btn btn-primary btn-sm">
-                    Cotar Agora
+                    Cotar sozinho sem conta
                 </a>
             <?php endif; ?>
         </div>
@@ -70,7 +70,7 @@ $uperfil = $user_perfil ?? null;
                 <a href="/logout" class="btn btn-ghost btn-sm" style="color:#dc2626;">Sair</a>
             <?php else: ?>
                 <a href="/login" class="btn btn-secondary btn-sm">Login</a>
-                <a href="/solicitar-plano" class="btn btn-primary btn-sm">Cotar Agora</a>
+                <a href="/solicitar-plano" class="btn btn-primary btn-sm">Cotar sozinho sem conta</a>
             <?php endif; ?>
         </div>
     </div>

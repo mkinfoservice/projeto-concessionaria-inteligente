@@ -28,7 +28,7 @@
                     <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18">
                         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    Cotar Plano Grátis
+                    Cotar sozinho sem conta
                 </a>
                 <a href="#section-operadoras" class="btn btn-soft-light">
                     Ver Operadoras
@@ -94,6 +94,9 @@
                     onclick="heroQuote()">
                 Ver Planos Disponíveis →
             </button>
+            <a href="/solicitar-plano" class="self-quote-link">
+                Preencher proposta sozinho, sem login
+            </a>
 
             <p style="text-align:center; font-size:0.78rem; color:rgba(255,255,255,0.45); margin-top:0.75rem;">
                 Sem compromisso. 100% gratuito.
@@ -149,6 +152,28 @@
         </span>
     </div>
 </div>
+
+<!-- ========== AUTOATENDIMENTO ========== -->
+<section class="section self-index-cta" id="cotacao-sem-conta" aria-label="Cotacao sem conta">
+    <div class="container">
+        <div class="self-index-card">
+            <div>
+                <div class="section-badge">Novo autoatendimento</div>
+                <h2>Quer cotar sozinho, sem criar conta?</h2>
+                <p>
+                    Abra o formulario publico, informe seus dados, escolha o plano e envie os documentos.
+                    Se algum vendedor te indicou, coloque o telefone dele no campo "Indicado por".
+                </p>
+            </div>
+            <div class="self-index-actions">
+                <a href="/solicitar-plano" class="btn btn-primary btn-lg">
+                    Iniciar cotacao sem conta
+                </a>
+                <small>Sem login. Sem cadastro previo. Direto para analise.</small>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- ========== DIFERENCIAIS ========== -->
 <section class="section" id="section-diferenciais" aria-label="Nossos diferenciais">
@@ -683,7 +708,7 @@
 
         <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-bottom:3rem;">
             <a href="/solicitar-plano" class="btn btn-primary btn-lg">
-                Cotar Agora — É Grátis
+                Cotar sozinho sem conta
             </a>
             <a href="https://wa.me/5521968827864?text=Olá!%20Quero%20cotar%20um%20plano%20de%20saúde."
                target="_blank" rel="noopener"
