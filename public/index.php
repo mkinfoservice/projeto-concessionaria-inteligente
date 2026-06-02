@@ -42,6 +42,7 @@ $routes = [
     // Empresa pública
     'empresa/cadastro'               => ['EmpresaController', 'cadastro'],
     'empresa/aguardando-pagamento'   => ['EmpresaController', 'aguardandoPagamento'],
+    'solicitar-plano'                 => ['PropostaController', 'autosservico'],
 
     // Painéis (requerem login)
     'admin/empresa'                  => ['EmpresaController',  'dashboard'],

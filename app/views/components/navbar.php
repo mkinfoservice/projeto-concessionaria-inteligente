@@ -43,9 +43,9 @@ $uperfil = $user_perfil ?? null;
                 <a href="/logout" class="btn btn-ghost btn-sm">Sair</a>
             <?php else: ?>
                 <a href="/login" class="btn btn-ghost btn-sm">Login</a>
-                <button class="btn btn-primary btn-sm" onclick="CIB.openModal('modal-cotacao')">
+                <a href="/solicitar-plano" class="btn btn-primary btn-sm">
                     Cotar Agora
-                </button>
+                </a>
             <?php endif; ?>
         </div>
 
@@ -70,7 +70,7 @@ $uperfil = $user_perfil ?? null;
                 <a href="/logout" class="btn btn-ghost btn-sm" style="color:#dc2626;">Sair</a>
             <?php else: ?>
                 <a href="/login" class="btn btn-secondary btn-sm">Login</a>
-                <button class="btn btn-primary btn-sm" onclick="CIB.openModal('modal-cotacao')">Cotar Agora</button>
+                <a href="/solicitar-plano" class="btn btn-primary btn-sm">Cotar Agora</a>
             <?php endif; ?>
         </div>
     </div>

@@ -24,12 +24,12 @@
             </p>
 
             <div class="hero-actions">
-                <button class="btn btn-primary btn-lg" onclick="CIB.openModal('modal-cotacao')">
+                <a href="/solicitar-plano" class="btn btn-primary btn-lg">
                     <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18">
                         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     Cotar Plano Grátis
-                </button>
+                </a>
                 <a href="#section-operadoras" class="btn btn-soft-light">
                     Ver Operadoras
                 </a>
@@ -682,9 +682,9 @@
         </p>
 
         <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-bottom:3rem;">
-            <button class="btn btn-primary btn-lg" onclick="CIB.openModal('modal-cotacao')">
+            <a href="/solicitar-plano" class="btn btn-primary btn-lg">
                 Cotar Agora — É Grátis
-            </button>
+            </a>
             <a href="https://wa.me/5521968827864?text=Olá!%20Quero%20cotar%20um%20plano%20de%20saúde."
                target="_blank" rel="noopener"
                class="btn btn-lg" style="background:#25D366; color:white; border-color:#25D366;">

@@ -54,21 +54,16 @@ class PropostaController
         $vendedorId = (int) $_SESSION['user_id'];
         $vendedor   = $this->vendedorModel->findById($vendedorId);
 
-        $pdo        = db();
-        $operadoras = $pdo->query("SELECT id, nome, slug FROM operadoras WHERE ativo = 1 ORDER BY nome")->fetchAll();
-        $planos     = $pdo->query("SELECT p.id, p.operadora_id, p.nome, p.categoria, p.cobertura,
-                                         p.faixa_0_18, p.faixa_19_28, p.faixa_29_43, p.faixa_44_58, p.faixa_59_plus
-                                  FROM planos p
-                                  JOIN operadoras o ON o.id = p.operadora_id
-                                  WHERE p.ativo = 1 AND o.ativo = 1
-                                  ORDER BY p.operadora_id, p.nome")->fetchAll();
+        [$operadoras, $planos] = $this->carregarCatalogoPlanos();
 
         $errors     = [];
         $input      = [];
         $csrf_token = $_SESSION['csrf_token'];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            [$errors, $input, $protocolo] = $this->processarProposta($csrf_token, $vendedor);
+            [$errors, $input, $protocolo] = $this->processarProposta($csrf_token, $vendedor, [
+                'origem' => 'VENDEDOR',
+            ]);
 
             if (empty($errors)) {
                 $_SESSION['flash'] = "Proposta $protocolo enviada! Aguardando análise do supervisor.";
@@ -88,13 +83,72 @@ class PropostaController
         include APP_PATH . '/views/layouts/main.php';
     }
 
-    private function processarProposta(string $csrf_token, array $vendedor): array
+    public function autosservico(): void
+    {
+        [$operadoras, $planos] = $this->carregarCatalogoPlanos();
+
+        $errors     = [];
+        $input      = [];
+        $csrf_token = $_SESSION['csrf_token'];
+        $protocolo  = $_GET['protocolo'] ?? null;
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            [$errors, $input, $protocolo] = $this->processarProposta($csrf_token, null, [
+                'origem' => 'AUTOSSERVICO',
+            ]);
+
+            if (empty($errors)) {
+                header('Location: /solicitar-plano?protocolo=' . urlencode((string)$protocolo));
+                exit;
+            }
+        }
+
+        $page_title    = 'Solicitar Plano';
+        $current_page  = 'solicitar-plano';
+        $is_logged_in  = !empty($_SESSION['logged_in']);
+        $user_type     = $_SESSION['user_type'] ?? null;
+        $user_perfil   = $_SESSION['user_data']['perfil'] ?? null;
+        $body_class    = 'self-service-page';
+
+        ob_start();
+        include APP_PATH . '/views/pages/proposta/autosservico.php';
+        $content = ob_get_clean();
+        include APP_PATH . '/views/layouts/main.php';
+    }
+
+    private function processarProposta(string $csrf_token, ?array $vendedor, array $context = []): array
     {
         $errors = [];
         $input  = $this->sanitizeInput($_POST);
+        $origem = $context['origem'] ?? 'VENDEDOR';
 
         if (!hash_equals($csrf_token, $_POST['csrf_token'] ?? '')) {
             return [['csrf' => 'Token inválido.'], $input, null];
+        }
+
+        if (!empty($_POST['website'] ?? '')) {
+            return [['form' => 'Nao foi possivel enviar a solicitacao.'], $input, null];
+        }
+
+        $vendedorComissao = $vendedor;
+        if ($origem === 'AUTOSSERVICO') {
+            $indicacao = preg_replace('/\D/', '', $input['indicado_por'] ?? '');
+            if ($indicacao !== '') {
+                if (strlen($indicacao) < 10) {
+                    $errors['indicado_por'] = 'Telefone de indicacao invalido.';
+                } else {
+                    $vendedorIndicado = $this->vendedorModel->findByTelefone($indicacao);
+                    if (
+                        !$vendedorIndicado
+                        || $vendedorIndicado['status'] !== 'ATIVO'
+                        || $vendedorIndicado['perfil'] !== 'VENDEDOR'
+                    ) {
+                        $errors['indicado_por'] = 'Vendedor indicado nao encontrado ou nao esta ativo.';
+                    } else {
+                        $vendedorComissao = $vendedorIndicado;
+                    }
+                }
+            }
         }
 
         // Valida beneficiário
@@ -242,26 +296,32 @@ class PropostaController
         $this->model->insert([
             'protocolo'          => $protocolo,
             'cliente_id'         => $clienteId,
-            'vendedor_id'        => (int)$vendedor['id'],
-            'empresa_id'         => $vendedor['empresa_id'] ?? null,
+            'vendedor_id'        => $vendedorComissao ? (int)$vendedorComissao['id'] : null,
+            'indicado_por_vendedor_id' => $origem === 'AUTOSSERVICO' && $vendedorComissao ? (int)$vendedorComissao['id'] : null,
+            'empresa_id'         => $vendedorComissao['empresa_id'] ?? null,
             'operadora_id'       => $operadoraId,
             'plano_id'           => $planoId,
             'categoria'          => $categoria,
             'quantidade_vidas'   => $qtdVidas,
             'valor_total'        => $valorTotal,
+            'origem'             => $origem,
             'status'             => 'PENDENTE_SUPERVISOR',
             'observacoes'        => $observacoes,
             'doc_frente_url'     => $docFrenteUrl,
             'doc_verso_url'      => $docVersoUrl,
             'doc_residencia_url' => $docResidenciaUrl,
             'doc_contracheque_url'=> $docContraUrl,
+            'gera_comissao'      => $vendedorComissao ? 1 : 0,
         ]);
 
-        log_action('PROPOSTA_CRIADA', 'INFO', [
-            'protocolo'   => $protocolo,
-            'vendedor_id' => $vendedor['id'],
-            'cliente_cpf' => $cpf,
-        ], (int)$vendedor['id']);
+        log_action($origem === 'AUTOSSERVICO' ? 'PROPOSTA_AUTOSSERVICO_CRIADA' : 'PROPOSTA_CRIADA', 'INFO', [
+            'protocolo'           => $protocolo,
+            'origem'              => $origem,
+            'vendedor_id'         => $vendedorComissao['id'] ?? null,
+            'gera_comissao'       => (bool)$vendedorComissao,
+            'indicacao_informada' => !empty($input['indicado_por']),
+            'cliente_cpf'         => $cpf,
+        ], $vendedorComissao ? (int)$vendedorComissao['id'] : null);
 
         return [[], $input, $protocolo];
     }
@@ -351,12 +411,26 @@ class PropostaController
         $fields = ['nome_completo','cpf','rg','data_nascimento','sexo','estado_civil',
                    'nome_mae','email','telefone','cep','endereco','bairro','numero',
                    'complemento','cidade','uf','profissao','operadora_id','plano_id',
-                   'categoria','quantidade_vidas','idades_vidas','observacoes'];
+                   'categoria','quantidade_vidas','idades_vidas','observacoes','indicado_por'];
         $out = [];
         foreach ($fields as $f) {
             $out[$f] = trim($post[$f] ?? '');
         }
         return $out;
+    }
+
+    private function carregarCatalogoPlanos(): array
+    {
+        $pdo        = db();
+        $operadoras = $pdo->query("SELECT id, nome, slug FROM operadoras WHERE ativo = 1 ORDER BY nome")->fetchAll();
+        $planos     = $pdo->query("SELECT p.id, p.operadora_id, p.nome, p.categoria, p.cobertura,
+                                         p.faixa_0_18, p.faixa_19_28, p.faixa_29_43, p.faixa_44_58, p.faixa_59_plus
+                                  FROM planos p
+                                  JOIN operadoras o ON o.id = p.operadora_id
+                                  WHERE p.ativo = 1 AND o.ativo = 1
+                                  ORDER BY p.operadora_id, p.nome")->fetchAll();
+
+        return [$operadoras, $planos];
     }
 
     private function validarCpf(string $cpf): bool

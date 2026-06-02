@@ -44,7 +44,7 @@ class PropostaModel extends BaseModel
                    pl.nome          AS plano_nome
             FROM propostas p
             JOIN clientes   c  ON p.cliente_id   = c.id
-            JOIN vendedores v  ON p.vendedor_id  = v.id
+            LEFT JOIN vendedores v  ON p.vendedor_id  = v.id
             LEFT JOIN empresas   e  ON p.empresa_id   = e.id
             LEFT JOIN operadoras op ON p.operadora_id = op.id
             LEFT JOIN planos     pl ON p.plano_id     = pl.id
@@ -92,7 +92,7 @@ class PropostaModel extends BaseModel
                    pl.nome         AS plano_nome
             FROM propostas p
             JOIN clientes   c  ON p.cliente_id   = c.id
-            JOIN vendedores v  ON p.vendedor_id  = v.id
+            LEFT JOIN vendedores v  ON p.vendedor_id  = v.id
             LEFT JOIN empresas   e  ON p.empresa_id   = e.id
             LEFT JOIN operadoras op ON p.operadora_id = op.id
             LEFT JOIN planos     pl ON p.plano_id     = pl.id

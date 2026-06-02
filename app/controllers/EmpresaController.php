@@ -339,11 +339,11 @@ class EmpresaController
         // Últimas propostas da empresa
         $stmtPropostas = $pdo->prepare(
             "SELECT p.protocolo, p.status, p.criado_em, c.nome_completo as cliente,
-                    v.nome_completo as vendedor
+                    COALESCE(v.nome_completo, 'Autosservico') as vendedor
              FROM propostas p
-             JOIN vendedores v ON p.vendedor_id = v.id
+             LEFT JOIN vendedores v ON p.vendedor_id = v.id
              JOIN clientes c ON p.cliente_id = c.id
-             WHERE v.empresa_id = ?
+             WHERE p.empresa_id = ?
              ORDER BY p.criado_em DESC LIMIT 10"
         );
         $stmtPropostas->execute([$empresaId]);

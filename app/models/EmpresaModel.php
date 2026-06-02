@@ -60,8 +60,7 @@ class EmpresaModel extends BaseModel
     {
         $stmt = $this->query(
             "SELECT COUNT(*) FROM propostas p
-             JOIN vendedores v ON p.vendedor_id = v.id
-             WHERE v.empresa_id = ?",
+             WHERE p.empresa_id = ?",
             [$empresaId]
         );
         return (int) $stmt->fetchColumn();
@@ -77,11 +76,11 @@ class EmpresaModel extends BaseModel
                     op.nome AS operadora_nome,
                     pl.nome AS plano_nome
              FROM propostas p
-             JOIN vendedores v ON p.vendedor_id = v.id
+             LEFT JOIN vendedores v ON p.vendedor_id = v.id
              JOIN clientes c ON p.cliente_id = c.id
              LEFT JOIN operadoras op ON p.operadora_id = op.id
              LEFT JOIN planos pl ON p.plano_id = pl.id
-             WHERE v.empresa_id = ?
+             WHERE p.empresa_id = ?
              ORDER BY p.criado_em DESC
              LIMIT ?",
             [$empresaId, $limit]
